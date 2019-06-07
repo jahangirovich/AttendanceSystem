@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/news"
+            android:icon="@drawable/ic_featured_play_list_black_24dp"
+            android:title="News" />
+
+        <item
+            android:id="@+id/nav_users"
+            android:icon="@drawable/ic_group_black_24dp"
+            android:title="Users" />
+
+        <item
+            android:id="@+id/nav_attendance"
+            android:icon="@drawable/ic_widgets_black_24dp"
+            android:title="Attendance" />
+
+    </group>
+
+</menu>

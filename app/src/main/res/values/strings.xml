@@ -1,0 +1,121 @@
+<resources>
+
+
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="city_prompt">Choose a country</string>
+    <string name="minimum_password">length of password must be 6</string>
+    <string name="auth_failed">Please try again</string>
+
+    <string-array name="city_arrays">
+        <item>1-01</item>
+        <item>1-02</item>
+        <item>1-03</item>
+        <item>1-04</item>
+        <item>2-01</item>
+        <item>2-02</item>
+        <item>3-01</item>
+        <item>3-02</item>
+    </string-array>
+
+    <string name="app_name">SDCL Attendance System</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="months">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+        <item>11</item>
+        <item>12</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="add_user_str">New user added</string>
+
+    <string name="error_fill_name">Fill name</string>
+    <string name="error_fill_phone">Fill phone</string>
+    <string name="error_fill_card">Fill Card number</string>
+    <string name="error_fill_login">Fill login</string>
+    <string name="error_fill_password">Fill password</string>
+
+    <string name="upload_image">Upload photo</string>
+    <string name="photoLoading">Photo uploading...</string>
+    <string name="userAdded">User added</string>
+    <string name="userSaved">User saved</string>
+    <string name="hourStr">час</string>
+
+    <string name="inetConnection">Check internet connection</string>
+
+    <string-array name="monthsList">
+        <item>Январь</item>
+        <item>Февраль</item>
+        <item>Март</item>
+        <item>Апрель</item>
+        <item>Май</item>
+        <item>Июнь</item>
+        <item>Июль</item>
+        <item>Август</item>
+        <item>Сентябрь</item>
+        <item>Октябрь</item>
+        <item>Ноябрь</item>
+        <item>Декабрь</item>
+    </string-array>
+
+    <string-array name="monthsListInEnglish">
+        <item>January</item>
+        <item>February</item>
+        <item>March</item>
+        <item>April</item>
+        <item>May</item>
+        <item>June</item>
+        <item>Jule</item>
+        <item>August</item>
+        <item>September</item>
+        <item>October</item>
+        <item>November</item>
+        <item>December</item>
+    </string-array>
+
+    <string-array name="dayNames">
+        <item>no date</item>
+        <item>Воскресенье</item>
+        <item>Понедельник</item>
+        <item>Вторник</item>
+        <item>Среда</item>
+        <item>Четверг</item>
+        <item>Пятница</item>
+        <item>Суббота</item>
+    </string-array>
+
+    <string-array name="dayNamesInEnglish">
+        <item>no date</item>
+        <item>Sunday</item>
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday
+        </item>
+        <item>Saturday</item>
+    </string-array>
+
+
+</resources>

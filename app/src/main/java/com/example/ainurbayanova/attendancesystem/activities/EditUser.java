@@ -46,7 +46,7 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class EditUser extends AppCompatActivity implements View.OnClickListener{
+public class EditUser extends AppCompatActivity implements View.OnClickListener {
     Toolbar toolbar;
     CardView cardView;
     CircleImageView putPhoto;
@@ -110,7 +110,7 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
         phoneNumberEdt.setText(user.getPhoneNumber());
         cardNumber.setText(user.getCardNumber());
 
-        if(!user.getPhoto().equals("no photo")){
+        if (!user.getPhoto().equals("no photo")) {
             Glide.with(this)
                     .load(user.getPhoto())
                     .into(putPhoto);
@@ -122,13 +122,10 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
         cardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (checkPermission()) {
-                    CropImage.activity()
-                            .setGuidelines(CropImageView.Guidelines.ON)
-                            .start(EditUser.this);
-                } else {
-                    requestPermission();
-                }
+                CropImage.activity()
+                        .setGuidelines(CropImageView.Guidelines.ON)
+                        .start(EditUser.this);
+
             }
         });
 
@@ -136,7 +133,7 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.addUSer:
 
                 boolean uOk = true;
@@ -159,15 +156,15 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
                     uOk = false;
                 }
 
-                if(spinner.getSelectedItem().equals("")){
+                if (spinner.getSelectedItem().equals("")) {
                     uOk = false;
                 }
 
                 if (uOk) {
-                    if(photoSelected) {
+                    if (photoSelected) {
                         imgStorageName = UUID.randomUUID().toString();
                         uploadImage();
-                    }else{
+                    } else {
                         uploadUser();
                     }
                 }
@@ -227,7 +224,7 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
                         public void onFailure(@NonNull Exception e) {
                             progressDialog.dismiss();
                             Toast.makeText(EditUser.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.i("failed","e: "+e.getMessage());
+                            Log.i("failed", "e: " + e.getMessage());
                         }
                     })
                     .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -241,19 +238,19 @@ public class EditUser extends AppCompatActivity implements View.OnClickListener{
         return downloadUri;
     }
 
-    public void uploadUser(){
+    public void uploadUser() {
         saveUser.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
 
         String spiner = (String) spinner.getSelectedItem();
         String fKey = user.getFkey();
 
-        if(!photoSelected){
+        if (!photoSelected) {
             downloadUri = user.getPhoto();
             imgStorageName = user.getfPhotoName();
         }
 
-        User newUser = new User(""+fKey, infoStr, phoneNumberStr, ""+downloadUri, ""+imgStorageName, ""+cardNumberStr,spiner);
+        User newUser = new User("" + fKey, infoStr, phoneNumberStr, "" + downloadUri, "" + imgStorageName, "" + cardNumberStr, spiner);
 
         databaseReference.child("user_list").child(fKey).setValue(newUser);
         increaseVersion();

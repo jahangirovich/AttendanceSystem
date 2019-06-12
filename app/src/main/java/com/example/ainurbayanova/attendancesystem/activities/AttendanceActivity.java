@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -17,6 +18,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,6 +26,7 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,6 +37,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,6 +45,7 @@ import com.bumptech.glide.Glide;
 import com.example.ainurbayanova.attendancesystem.R;
 import com.example.ainurbayanova.attendancesystem.adapter.AttendanceAdapter;
 import com.example.ainurbayanova.attendancesystem.database.StoreDatabase;
+import com.example.ainurbayanova.attendancesystem.interfaces.ItemClickListener;
 import com.example.ainurbayanova.attendancesystem.modules.Attendance;
 import com.example.ainurbayanova.attendancesystem.modules.Entered;
 import com.example.ainurbayanova.attendancesystem.modules.User;
@@ -84,8 +89,7 @@ public class AttendanceActivity extends AppCompatActivity {
 
     Toolbar toolbar;
 
-    TextView pastPastDay;
-    TextView pastDay;
+    FirebaseUser firebaseUser;
     TextView nowDay;
     EditText editTextAttendance;
     SQLiteDatabase sqdb;
@@ -123,6 +127,7 @@ public class AttendanceActivity extends AppCompatActivity {
         pastPastDayList = new HashSet<>();
         pastDayList = new HashSet<>();
         progressBar = findViewById(R.id.progressBar);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Attendance");
@@ -138,7 +143,6 @@ public class AttendanceActivity extends AppCompatActivity {
         dayNames = getResources().getStringArray(R.array.dayNames);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
         if (checkInternetConnection()) {
             initializeAttendanceFunc();
             createAttendDescDilaog();
@@ -147,6 +151,66 @@ public class AttendanceActivity extends AppCompatActivity {
             checkVersion();
             setDatesForMenuButtons();
         }
+    }
+
+    public void initDialog(final int position) {
+        LayoutInflater factory = LayoutInflater.from(this);
+
+        final View listDialog = factory.inflate(R.layout.dialog_of_menu, null);
+        final AlertDialog.Builder alertTimeDialog = new AlertDialog.Builder(this);
+        RelativeLayout deleteLayout = listDialog.findViewById(R.id.remove);
+        RelativeLayout clockLayout = listDialog.findViewById(R.id.setLate);
+        clockLayout.setVisibility(View.GONE);
+        alertTimeDialog.setView(listDialog);
+        final AlertDialog hi = alertTimeDialog.show();
+
+        deleteLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                yesOrNo(position);
+                hi.dismiss();
+            }
+        });
+
+    }
+
+    public void yesOrNo(final int position) {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                switch (which) {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        mDatabaseRef.child("attendance").child(today).child(attendances.get(position).getfKey()).removeValue();
+                        Toast.makeText(AttendanceActivity.this, "Removed!", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                        getAttendanceUserFromFr();
+                        break;
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        break;
+                }
+            }
+        };
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are your sure").setPositiveButton("Yes", dialogClickListener)
+                .setNegativeButton("No", dialogClickListener).show();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        finish();
     }
 
     public void createAttendDescDilaog() {
@@ -227,6 +291,16 @@ public class AttendanceActivity extends AppCompatActivity {
                         progressBar.setVisibility(View.GONE);
                         adapter = new AttendanceAdapter(AttendanceActivity.this, attendances, dayNames);
                         recyclerView.setAdapter(adapter);
+                        adapter.setItemClickListener(new ItemClickListener() {
+                            @Override
+                            public void onItemClick(View v, int pos) {
+                                initDialog(pos);
+                            }
+                            @Override
+                            public void onItemLongClick(View v, int pos) {
+
+                            }
+                        });
                     }
 
                     @Override
@@ -249,7 +323,6 @@ public class AttendanceActivity extends AppCompatActivity {
         editTextAttendance.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 progressBar.setVisibility(View.VISIBLE);
-                recyclerView.setVisibility(View.GONE);
                 if (checkInternetConnection() && (event.getAction() == KeyEvent.ACTION_DOWN) && (keyCode == KeyEvent.KEYCODE_ENTER)) {
                     final String card_number = editTextAttendance.getText().toString().toLowerCase();
                     editTextAttendance.setText("");
@@ -259,7 +332,6 @@ public class AttendanceActivity extends AppCompatActivity {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
                                     boolean isExist = false;
-
                                     User now_user = null;
                                     for (DataSnapshot data : dataSnapshot.getChildren()) {
                                         User user = data.getValue(User.class);
@@ -289,21 +361,25 @@ public class AttendanceActivity extends AppCompatActivity {
                                                 int parsedHour = Integer.parseInt(splitted[0]);
                                                 int parsedMinute = Integer.parseInt(splitted[1]);
                                                 String[] enteredTime = null;
-                                                HashMap<String, String> time = new HashMap<>();
-                                                time.put("time", getCurrentTime());
-                                                time.put("notified", "false");
+                                                Entered entered = new Entered();
+                                                entered.setTime(getCurrentTime());
+                                                entered.setNotified(false);
+
                                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
                                                     if (data.getKey().equals(today) && data.child(curUser.getFkey()).exists()) {
                                                         exist = true;
                                                         for (DataSnapshot dating : data.getChildren()) {
-                                                            if (dating.child("entered").exists() && dating.child("closed").exists()) {
-                                                                isEntered = true;
-                                                                isClosed = true;
-                                                            } else if (dating.child("entered").exists()) {
-                                                                isEntered = true;
-                                                                enteredTime = dating.child("entered").child("time").getValue().toString().split(":");
-                                                            } else if (dating.child("closed").exists()) {
-                                                                isClosed = true;
+                                                            if(dating.getKey().equals(curUser.getFkey())){
+                                                                if (dating.child("entered").exists() && dating.child("closed").exists()) {
+                                                                    isEntered = true;
+                                                                    isClosed = true;
+                                                                } else if (dating.child("entered").exists()) {
+                                                                    isEntered = true;
+                                                                    Log.i("info",dating + "");
+                                                                    enteredTime = dating.child("entered").child("time").getValue().toString().split(":");
+                                                                } else if (dating.child("closed").exists()) {
+                                                                    isClosed = true;
+                                                                }
                                                             }
                                                         }
                                                     }
@@ -316,26 +392,27 @@ public class AttendanceActivity extends AppCompatActivity {
                                                     if (enteredTime != null) {
                                                         total_entered = Integer.parseInt(enteredTime[0]) * 60 + Integer.parseInt(enteredTime[1]) + 5;
                                                     }
-                                                    if (isEntered && parsedHour >= 13 && total <= total_end && (total >= total_entered)) {
-                                                        time.put("action", "early");
-                                                        mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("closed").setValue(time);
+                                                    Log.i("info",parsedHour + "" + parsedMinute + " MY");
+                                                    Log.i("info",Integer.parseInt(enteredTime[0]) + "" +  Integer.parseInt(enteredTime[1]) + "YOUR");
+                                                    if (isEntered && (total <= total_end) && (total >= total_entered)) {
+                                                        entered.setAction("early");
+                                                        mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("closed").setValue(entered);
                                                     } else if (isEntered && isClosed) {
                                                         Toast.makeText(AttendanceActivity.this, "Sorry but you are already in", Toast.LENGTH_SHORT).show();
                                                     } else if (isEntered && total >= total_end && total <= total_close && (Integer.parseInt(enteredTime[0]) <= parsedHour && Integer.parseInt(enteredTime[1]) < parsedMinute + 5)) {
-                                                        time.put("action", "late");
-                                                        mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("closed").setValue(time);
+                                                        entered.setAction("early");
+                                                        mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("closed").setValue(entered);
                                                     }
                                                 } else if (!exist) {
-                                                    time.put("time", getCurrentTime());
                                                     if (parsedHour < 5 || parsedHour > 19 && parsedMinute >= 35) {
                                                         Toast.makeText(AttendanceActivity.this, "Sorry college is closed", Toast.LENGTH_SHORT).show();
                                                     } else {
                                                         if (parsedHour <= 8 && parsedMinute <= 30) {
-                                                            time.put("action", "early");
-                                                            mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("entered").setValue(time);
+                                                            entered.setAction("early");
+                                                            mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("entered").setValue(entered);
                                                         } else {
-                                                            time.put("action", "late");
-                                                            mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("entered").setValue(time);
+                                                            entered.setAction("late");
+                                                            mDatabaseRef.child("attendance").child(today).child(curUser.getFkey()).child("entered").setValue(entered);
                                                         }
                                                     }
                                                 }
@@ -350,6 +427,7 @@ public class AttendanceActivity extends AppCompatActivity {
                                             }
                                         });
                                         progressBar.setVisibility(View.GONE);
+                                        getAttendanceUserFromFr();
                                     } else if (!isExist) {
                                         userDescDialog.show();
                                         dialogShowingTimer.start();
@@ -368,10 +446,9 @@ public class AttendanceActivity extends AppCompatActivity {
                         } else {
                             System.out.println("id_number length is Zero ");
                         }
-                    }
-                    else{
+                    } else {
                         progressBar.setVisibility(View.GONE);
-                        Toast.makeText(AttendanceActivity.this,"Sorry but today is sunday or saturday",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AttendanceActivity.this, "Sorry but today is sunday or saturday", Toast.LENGTH_SHORT).show();
                     }
                 }
                 return false;
@@ -379,8 +456,8 @@ public class AttendanceActivity extends AppCompatActivity {
         });
     }
 
-    public void callIt(){
-        if(user.getEmail().equals("parent@sdcl.kz")){
+    public void callIt() {
+        if (user.getEmail().equals("parent@sdcl.kz")) {
             startService(new Intent(AttendanceActivity.this, ParentServices.class));
         }
     }
@@ -389,12 +466,16 @@ public class AttendanceActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
 
         getMenuInflater().inflate(R.menu.attendance_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.profile);
+        MenuItem menuItem2 = menu.findItem(R.id.calendar);
+        menuItem.setVisible(false);
+        menuItem2.setVisible(false);
+
         return true;
     }
 
     EditText passwordEdt;
     TextView incorrectPassword;
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

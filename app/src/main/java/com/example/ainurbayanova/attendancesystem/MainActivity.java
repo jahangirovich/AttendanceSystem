@@ -26,10 +26,12 @@ import com.example.ainurbayanova.attendancesystem.activities.AddUser;
 import com.example.ainurbayanova.attendancesystem.activities.Add_News;
 import com.example.ainurbayanova.attendancesystem.activities.LoginPage;
 import com.example.ainurbayanova.attendancesystem.activities.Profile;
+import com.example.ainurbayanova.attendancesystem.activities.aboutUsActivity;
 import com.example.ainurbayanova.attendancesystem.activities.calendarActivity;
 import com.example.ainurbayanova.attendancesystem.fragments.Attendance_fragment;
 import com.example.ainurbayanova.attendancesystem.fragments.News_Fragments;
 import com.example.ainurbayanova.attendancesystem.fragments.NoteFragment;
+import com.example.ainurbayanova.attendancesystem.fragments.ScheduleFragment;
 import com.example.ainurbayanova.attendancesystem.fragments.User_fragment;
 import com.example.ainurbayanova.attendancesystem.interfaces.ShowInterface;
 import com.example.ainurbayanova.attendancesystem.modules.News;
@@ -112,6 +114,7 @@ public class MainActivity extends AppCompatActivity
         changeFragment(new Attendance_fragment());
 //        checkInet();
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -121,8 +124,16 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        Log.i("info","We are destroyed");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
+        finish();
+        Log.i("info","We are destroyed");
     }
 
     @Override
@@ -132,11 +143,6 @@ public class MainActivity extends AppCompatActivity
             drawer.closeDrawer(GravityCompat.START);
         } else {
 
-        }
-        if (searchView.isSearchOpen()) {
-            searchView.closeSearch();
-        } else {
-            Toast.makeText(this, "To exit press sign out menu", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -148,8 +154,7 @@ public class MainActivity extends AppCompatActivity
         profile.setVisible(false);
         if(!user.getEmail().equals("admin@sdcl.kz"))
             item.setVisible(false);
-        if(user.getEmail().equals("parent@sdcl.kz"))
-            profile.setVisible(true);
+
 //        getMenuInflater().inflate(R.menu.main, menu);
 
         /*searchView = findViewById(R.id.search_view);
@@ -204,28 +209,6 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this,calendarActivity.class));
                 break;
             case R.id.profile:
-                databaseReference.child("user_list").addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User item = null;
-
-                        for (DataSnapshot data:dataSnapshot.getChildren()){
-                            if(data.getKey().equals("i1559550628490")){
-                                item = data.getValue(User.class);
-                            }
-                        }
-                        Intent intent = new Intent(MainActivity.this, Profile.class);
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("user", item);
-                        intent.putExtras(bundle);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-
-                    }
-                });
                 break;
         }
 
@@ -248,6 +231,30 @@ public class MainActivity extends AppCompatActivity
                 fab.setVisibility(View.VISIBLE);
                 fab2.setVisibility(View.GONE);
             }
+            if(user.getEmail().equals("parent@sdcl.kz")){
+                databaseReference.child("user_list").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User item = null;
+
+                        for (DataSnapshot data:dataSnapshot.getChildren()){
+                            if(data.getKey().equals("i1560311579343")){
+                                item = data.getValue(User.class);
+                            }
+                        }
+                        Intent intent = new Intent(MainActivity.this, Profile.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("user", item);
+                        intent.putExtras(bundle);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
             getSupportActionBar().setTitle("Users");
         } else if (id == R.id.nav_attendance) {
             changeFragment(new Attendance_fragment());
@@ -267,6 +274,13 @@ public class MainActivity extends AppCompatActivity
 
         }
 
+        else if(id == R.id.group){
+            startActivity(new Intent(this,aboutUsActivity.class));
+        }
+        else if(id == R.id.schedule){
+            changeFragment(new ScheduleFragment());
+        }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
@@ -277,6 +291,7 @@ public class MainActivity extends AppCompatActivity
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1) {
             if (resultCode == RESULT_OK) {
+
                 changeFragment(user_fragment);
             }
         }

@@ -20,6 +20,15 @@
             android:icon="@drawable/ic_widgets_black_24dp"
             android:title="Attendance" />
 
+        <item
+            android:id="@+id/group"
+            android:icon="@drawable/ic_group_black_24dp"
+            android:title="Teachers" />
+
+        <item
+            android:id="@+id/schedule"
+            android:icon="@drawable/ic_format_list_bulleted_black_24dp"
+            android:title="Schedule" />
     </group>
 
 </menu>

@@ -17,4 +17,6 @@
         android:icon="@drawable/ic_exit_to_app_black_24dp"
         android:title="Sign Out"
         app:showAsAction="always" />
+
+
 </menu>

@@ -29,6 +29,8 @@ import com.example.ainurbayanova.attendancesystem.fragments.profile_fragments.Pr
 import com.example.ainurbayanova.attendancesystem.fragments.profile_fragments.ProfileLateDays;
 import com.example.ainurbayanova.attendancesystem.fragments.profile_fragments.ProfileSkipFragment;
 import com.example.ainurbayanova.attendancesystem.modules.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -64,6 +66,7 @@ public class Profile extends AppCompatActivity {
     ProfileAttendanceFragment profileAttendanceFragment;
     ProfileSkipFragment profileSkipFragment;
     ProfileLateDays profileLateDays;
+    FirebaseUser firebaseUser;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,6 +90,7 @@ public class Profile extends AppCompatActivity {
 
     public void initWidgets() {
         toolbar = findViewById(R.id.toolbars);
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         appBarLayout = findViewById(R.id.app_bar);
         profileAttendanceFragment = new ProfileAttendanceFragment();
         profileSkipFragment = new ProfileSkipFragment();
@@ -138,6 +142,7 @@ public class Profile extends AppCompatActivity {
             username.setText(u.getInfo());
             phoneNumber.setText(u.getPhoneNumber());
             totalLate.setText(u.getCardNumber());
+            totalEarly.setText(u.getSpinner());
         }
     }
 
@@ -170,8 +175,10 @@ public class Profile extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.detail_menu, menu);
+        if(firebaseUser.getEmail().equals("admin@sdcl.kz") || firebaseUser.getEmail().equals("parent@sdcl.kz")){
+            MenuInflater inflater = getMenuInflater();
+            inflater.inflate(R.menu.detail_menu, menu);
+        }
 
         return true;
     }

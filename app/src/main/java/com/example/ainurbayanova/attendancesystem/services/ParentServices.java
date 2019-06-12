@@ -64,7 +64,7 @@ public class ParentServices extends Service {
     }
 
     public void uploadUserByKey(){
-        databaseReference.child("attendance").child(today).child("i1559550628490").addChildEventListener(new ChildEventListener() {
+        databaseReference.child("attendance").child(today).child("i1560311579343").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String time = "";
@@ -77,10 +77,9 @@ public class ParentServices extends Service {
                     Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
                     PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(),
                             0, notificationIntent, 0);
-
                     Notification notification = new NotificationCompat.Builder(getApplicationContext(), channel1_id)
                             .setContentTitle("WELCOME")
-                            .setContentText(time + " entered to college.\n It is " + late)
+                            .setContentText("Your son(daughter)\n"+time + " entered to college.It is " + late)
                             .setSmallIcon(R.drawable.success_icon)
                             .setContentIntent(pendingIntent)
                             .setDefaults(Notification.DEFAULT_SOUND)
@@ -88,7 +87,7 @@ public class ParentServices extends Service {
                             .setAutoCancel(true)
                             .build();
                     notificationManagerCompat.notify(1, notification);
-                    databaseReference.child("attendance").child(today).child("i1559550628490").child("entered").child("notified").setValue(true);
+                    databaseReference.child("attendance").child(today).child("i1560311579343").child("entered").child("notified").setValue(true);
                 }
             }
 

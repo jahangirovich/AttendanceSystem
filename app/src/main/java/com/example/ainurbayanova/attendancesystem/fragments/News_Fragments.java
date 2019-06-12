@@ -46,6 +46,7 @@ public class News_Fragments extends Fragment {
     FirebaseUser firebaseUser;
     TextView showNotAdmin;
     LinearLayout all;
+
     public News_Fragments() {
 
     }
@@ -53,7 +54,7 @@ public class News_Fragments extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.activity_news,container,false);
+        view = inflater.inflate(R.layout.activity_news, container, false);
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         initWidgets();
         uploadFromFirebase();
@@ -62,7 +63,7 @@ public class News_Fragments extends Fragment {
         return view;
     }
 
-    public void clickListener(){
+    public void clickListener() {
         newsAdapter.setItemClickListener(new ItemClickListener() {
             @Override
             public void onItemClick(View v, int pos) {
@@ -71,17 +72,21 @@ public class News_Fragments extends Fragment {
 
             @Override
             public void onItemLongClick(View v, int pos) {
-                initDialog(pos);
+                if(firebaseUser.getEmail().equals("admin@sdcl.kz")){
+                    initDialog(pos);
+                }
             }
         });
     }
 
-    public void initDialog(final int position){
+    public void initDialog(final int position) {
         LayoutInflater factory = LayoutInflater.from(getActivity());
 
         final View listDialog = factory.inflate(R.layout.dialog_of_menu, null);
         final AlertDialog.Builder alertTimeDialog = new AlertDialog.Builder(getActivity());
         RelativeLayout deleteLayout = listDialog.findViewById(R.id.remove);
+        RelativeLayout setTimeLayout = listDialog.findViewById(R.id.setLate);
+        setTimeLayout.setVisibility(View.GONE);
         alertTimeDialog.setView(listDialog);
         final AlertDialog hi = alertTimeDialog.show();
 
@@ -92,16 +97,17 @@ public class News_Fragments extends Fragment {
                 hi.dismiss();
             }
         });
+
     }
 
-    public void yesOrNo(final int position){
+    public void yesOrNo(final int position) {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         databaseReference.child("news").child(newsArrayList.get(position).getFkey()).removeValue();
-                        Toast.makeText(getActivity(),"Removed!",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Removed!", Toast.LENGTH_SHORT).show();
                         dialog.dismiss();
                         newsAdapter.notifyDataSetChanged();
                         break;
@@ -115,39 +121,38 @@ public class News_Fragments extends Fragment {
                 .setNegativeButton("No", dialogClickListener).show();
     }
 
-    public void initWidgets(){
+    public void initWidgets() {
         recyclerView = view.findViewById(R.id.recyclerView);
         progressBar = view.findViewById(R.id.progressBar);
         textView = view.findViewById(R.id.textView);
-        newsAdapter = new NewsAdapter(getActivity(),newsArrayList);
+        newsAdapter = new NewsAdapter(getActivity(), newsArrayList);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         showNotAdmin = view.findViewById(R.id.showNotAdmin);
         all = view.findViewById(R.id.all);
-        if(firebaseUser.getEmail().equals("check@sdcl.kz")){
+        if (firebaseUser.getEmail().equals("check@sdcl.kz")) {
             all.setVisibility(View.GONE);
             showNotAdmin.setVisibility(View.VISIBLE);
-        }
-        else{
+        } else {
             all.setVisibility(View.VISIBLE);
             showNotAdmin.setVisibility(View.GONE);
         }
     }
 
-    private void uploadFromFirebase(){
+    private void uploadFromFirebase() {
         databaseReference.child("news").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 newsArrayList.clear();
-                for (DataSnapshot data:dataSnapshot.getChildren()){
+                for (DataSnapshot data : dataSnapshot.getChildren()) {
                     News news = data.getValue(News.class);
                     newsArrayList.add(news);
                 }
                 initRecycler();
-                if(newsArrayList.size() == 0){
+                if (newsArrayList.size() == 0) {
                     progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.GONE);
                     textView.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     progressBar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
                     textView.setVisibility(View.GONE);
@@ -161,7 +166,7 @@ public class News_Fragments extends Fragment {
         });
     }
 
-    public void initRecycler(){
+    public void initRecycler() {
         newsAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(newsAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

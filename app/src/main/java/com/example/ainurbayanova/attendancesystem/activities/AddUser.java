@@ -205,7 +205,6 @@ public class AddUser extends AppCompatActivity implements View.OnClickListener{
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                             progressDialog.dismiss();
                             downloadUri = taskSnapshot.getDownloadUrl().toString();
-
                             if (downloadUri != null) {
                                 uploadUser();
                             }

@@ -11,7 +11,10 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.example.ainurbayanova.attendancesystem.R;
 import com.example.ainurbayanova.attendancesystem.activities.AttendanceActivity;
+import com.example.ainurbayanova.attendancesystem.interfaces.ItemClickListener;
 import com.example.ainurbayanova.attendancesystem.modules.Attendance;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -23,16 +26,22 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.My
     private Context context;
     private ArrayList<Attendance> userList;
     Calendar calendar;
+    FirebaseUser firebaseUser;
     String[] dayNames;
+    ItemClickListener itemClickListener;
 
     public AttendanceAdapter(Context context, ArrayList<Attendance> userSet, String[] dayNames) {
         this.context = context;
         this.dayNames = dayNames;
         this.userList = userSet;
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         calendar = Calendar.getInstance();
 //        dayNames = context.getResources().getStringArray(R.array.dayNames);
     }
 
+    public void setItemClickListener(ItemClickListener itemClickListener){
+        this.itemClickListener = itemClickListener;
+    }
 
     public class MyTViewHolder extends RecyclerView.ViewHolder {
         CircleImageView imageView;
@@ -47,6 +56,14 @@ public class AttendanceAdapter extends RecyclerView.Adapter<AttendanceAdapter.My
             time = view.findViewById(R.id.time);
             enterDate = view.findViewById(R.id.enterDate);
             exitDate = view.findViewById(R.id.exitDate);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(itemClickListener != null){
+                        itemClickListener.onItemClick(v,getAdapterPosition());
+                    }
+                }
+            });
         }
     }
 

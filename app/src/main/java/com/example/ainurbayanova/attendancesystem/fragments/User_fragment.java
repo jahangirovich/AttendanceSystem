@@ -170,7 +170,7 @@ public class User_fragment extends Fragment {
         if ((myHour * 60 + myMinute <= enterTimeHour * 60 + 30)) {
             enterHour = enterTimeHour - myHour;
             enterMinute = enterTimeMinute - myMinute;
-            final Entered entered = new Entered("early", enterHour + ":" + enterMinute,false);
+            final Entered entered = new Entered("early", myHour + ":" + myMinute,false);
             if (!(enterHour > 2)) {
                 databaseReference.child("attendance").addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -201,7 +201,7 @@ public class User_fragment extends Fragment {
         } else if ((myHour * 60 + myMinute >= enterTimeHour * 60 + 30)) {
             enterHour = myHour - enterTimeHour;
             enterMinute = myMinute - enterTimeMinute;
-            Entered entered = new Entered("late", enterHour + ":" + enterMinute,false);
+            Entered entered = new Entered("late", myHour + ":" + myMinute,false);
             if (!(enterHour > 7)) {
                 databaseReference.child("attendance").child(today).child(userArrayList.get(x).getFkey()).child("entered").setValue(entered);
             } else {

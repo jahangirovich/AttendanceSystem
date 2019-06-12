@@ -168,9 +168,9 @@ public class Attendance_fragment extends Fragment {
                                         attendances.add(new_attend);
                                     }
                                 }
-                                if(user.getEmail().equals("parent@sdcl.kz")){
+                                else if(user.getEmail().equals("parent@sdcl.kz")){
                                     if (data.getKey().equals(attendance.getfKey())) {
-                                        if(attendance.getfKey().equals("i1559550628490")){
+                                        if(attendance.getfKey().equals("i1560311579343")){
                                             Attendance new_attend = new Attendance(attendance.getDate(),
                                                     attendance.getfKey(),
                                                     data.child("info").getValue().toString(),
